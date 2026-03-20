@@ -13,92 +13,84 @@ pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
-Backend will be available at: http://localhost:8000
+Backend: http://localhost:8000
 
-**Frontend (in a new terminal):**
+**Frontend (new terminal):**
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-Frontend will be available at: http://localhost:5173
+Frontend: http://localhost:5173
 
-### Using Docker Compose
-
-Requirements: Docker & Docker Compose installed
-
-```bash
-# Create a .env file in the root directory
-echo "GROQ_API_KEY=your_groq_api_key_here" > .env
-echo "SECRET_KEY=$(python -c 'import secrets; print(secrets.token_hex(32))')" >> .env
-
-# Build and run
-docker-compose up --build
-
-# Access:
-# Frontend: http://localhost:3000
-# Backend: http://localhost:8000
-# API Docs: http://localhost:8000/docs
-```
+---
 
 ## Project Structure
 
 ```
 medai-project/
 ├── backend/
-│   ├── main.py              # FastAPI app entry
+│   ├── main.py              # FastAPI app
 │   ├── config.py            # Configuration
 │   ├── requirements.txt      # Python dependencies
-│   ├── Dockerfile           # Docker image for backend
+│   ├── render.yaml          # Render deployment config
 │   ├── middleware/          # Auth middleware
-│   ├── routes/              # API routes (auth, chat, upload)
-│   ├── services/            # Business logic (embeddings)
-│   └── faiss_index/         # Vector store (local)
+│   ├── routes/              # API routes
+│   └── services/            # Business logic
 ├── frontend/
 │   ├── src/                 # React components
-│   ├── public/              # Static files
+│   ├── vercel.json          # Vercel deployment config
 │   ├── package.json         # Node dependencies
-│   ├── vite.config.js       # Vite configuration
-│   ├── Dockerfile           # Docker image for frontend
-│   └── index.html           # Entry HTML
-├── docker-compose.yml       # Docker Compose config
+│   ├── vite.config.js       # Vite config
+│   └── index.html           # Entry point
 ├── DEPLOYMENT.md            # Deployment guide
-├── .gitignore               # Git ignore rules
-└── README.md                # Project documentation
+└── QUICKSTART.md            # This file
 ```
 
-## API Endpoints
+---
 
-### Authentication
-- `POST /login` - Login with username and role
-- `GET /protected` - Test protected endpoint
+## Deploy to Production
 
-### Chat
-- `POST /chat` - Send message to AI
+### Frontend: Deploy on Vercel
+1. Go to https://vercel.com
+2. Import your GitHub repo
+3. Set root directory to `frontend`
+4. Add `VITE_API_URL` environment variable
+5. Deploy!
 
-### Upload
-- `POST /upload` - Upload PDF for processing (admin only)
+### Backend: Deploy on Render
+1. Go to https://render.com
+2. Create new Web Service
+3. Select your GitHub repo
+4. Set root path to `backend`
+5. Add environment variables
+6. Deploy!
 
-See http://localhost:8000/docs for full API documentation
+See **DEPLOYMENT.md** for detailed step-by-step instructions.
+
+---
 
 ## Environment Variables
 
-### Backend (.env)
+### Backend (.env or Render)
 ```
-GROQ_API_KEY=your_groq_api_key_here
-SECRET_KEY=your_secret_key_here
+GROQ_API_KEY=your_key_here
+SECRET_KEY=your_secret_here
 ALGORITHM=HS256
 ```
 
-### Frontend (.env)
+### Frontend (.env or Vercel)
 ```
-VITE_API_URL=http://localhost:8000
+VITE_API_URL=https://your-backend-url.onrender.com
 ```
 
-## Next Steps
+---
 
-1. Install Docker: https://docs.docker.com/install
-2. Create GitHub repository
-3. Follow DEPLOYMENT.md for Railway setup
-4. Monitor logs and metrics in Railway dashboard
+## API Endpoints
+
+- `POST /login` - Login
+- `POST /chat` - Send message
+- `POST /upload` - Upload PDF (admin only)
+
+See http://localhost:8000/docs for full API docs

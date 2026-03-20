@@ -1,151 +1,180 @@
-# Deployment Guide - Railway
+# Deployment Guide - Vercel (Frontend) + Render (Backend)
 
-This guide will help you deploy the MedAI project to Railway in minutes.
+This guide will deploy your app on Vercel (Frontend) and Render (Backend) - **completely FREE!**
+
+---
 
 ## Prerequisites
 
-1. **GitHub Account** - Push your code to GitHub
-2. **Railway Account** - Sign up at https://railway.app
-3. **API Keys**:
-   - Groq API Key (from https://console.groq.com)
-   - Generate a strong SECRET_KEY for JWT
+1. **GitHub Account** ✅ (Already have code pushed)
+2. **Vercel Account** - Sign up at https://vercel.com (free, uses GitHub)
+3. **Render Account** - Sign up at https://render.com (free)
+4. **Groq API Key** - Get from https://console.groq.com
+5. **SECRET_KEY** - Run: `python -c "import secrets; print(secrets.token_hex(32))"`
 
-## Step 1: Prepare Your Repository
+---
 
-### 1.1 Initialize Git (if not already done)
-```bash
-cd /e/medai-project
-git init
-git add .
-git commit -m "Initial commit"
+## STEP 1: Deploy Backend on Render
+
+### 1.1: Create Render Account
+- Go to: https://render.com
+- Click "Sign Up"
+- Choose "GitHub" to sign up
+- Authorize GitHub access
+
+### 1.2: Connect Your Repository
+1. Dashboard → Click **"New +"** → **"Web Service"**
+2. Select **"Build and deploy from a Git repository"**
+3. Click **"Connect account"** (GitHub)
+4. Find and select **`medai-project`** repository
+5. Click **"Connect"**
+
+### 1.3: Configure Backend Service
+
+Fill in these settings:
+
+```
+Name: medai-backend
+Environment: Python 3
+Region: Oregon (us-west)
+Branch: main
+Build Command: pip install -r requirements.txt
+Start Command: uvicorn main:app --host 0.0.0.0 --port $PORT
 ```
 
-### 1.2 Create a .gitignore file
-```bash
-# Backend
-backend/venv/
-backend/__pycache__/
-backend/.env
-backend/faiss_index/
-backend/*.db
+**Important:** Make sure the root path is set to `backend/` or the start command area shows it's looking at backend/main.py
 
-# Frontend
-frontend/node_modules/
-frontend/dist/
-frontend/.env
-frontend/.env.local
+### 1.4: Add Environment Variables
+
+Before deploying, scroll down and add these in "Environment":
+
+```
+GROQ_API_KEY = [your Groq API key]
+SECRET_KEY = [your generated secret key]
+ALGORITHM = HS256
 ```
 
-### 1.3 Push to GitHub
-```bash
-# Create a new repository on GitHub, then:
-git remote add origin https://github.com/YOUR_USERNAME/medai-project.git
-git branch -M main
-git push -u origin main
+### 1.5: Deploy
+- Click **"Create Web Service"**
+- Wait for deployment (takes 2-3 minutes)
+- You'll get a URL like: `https://medai-backend.onrender.com`
+- **Save this URL!** You need it for the frontend
+
+#### Check Backend Status
+- Click on your service
+- Go to "Logs" tab to see if it started correctly
+
+---
+
+## STEP 2: Deploy Frontend on Vercel
+
+### 2.1: Create Vercel Account
+- Go to: https://vercel.com
+- Click "Sign Up"
+- Choose "GitHub"
+- Authorize GitHub access
+
+### 2.2: Deploy Project
+1. Dashboard → Click **"Add New..."** → **"Project"**
+2. Import **`medai-project`** repository
+3. Click **"Import"**
+
+### 2.3: Configure Frontend
+1. For "Root Directory" - select: **`frontend`**
+2. Framework: **React**
+3. Build Command: `npm run build` (should auto-detect)
+4. Output Directory: `dist` (should auto-detect)
+
+### 2.4: Add Environment Variables
+Before deploying, add in "Environment Variables":
+
+```
+Name: VITE_API_URL
+Value: https://medai-backend.onrender.com
+(Use the URL you got from Render backend)
 ```
 
-## Step 2: Deploy to Railway
+### 2.5: Deploy
+- Click **"Deploy"**
+- Wait for deployment (takes 1-2 minutes)
+- You'll get a URL like: `https://medai-frontend.vercel.app`
+- **This is your live app!** 🎉
 
-### 2.1 Connect Railway to GitHub
-1. Go to https://railway.app
-2. Click "New Project" → "Deploy from GitHub"
-3. Select your repository
-4. Railway will auto-detect both services (Dockerfile in backend and frontend)
+---
 
-### 2.2 Configure Backend Service
+## You're Live! 🚀
 
-Railway will create two services: `backend` and `frontend`
+**Your URLs:**
+- **Frontend:** `https://medai-frontend.vercel.app` ← Click here!
+- **Backend API:** `https://medai-backend.onrender.com`
 
-**For Backend Service:**
-1. Click on the backend service
-2. Go to "Variables"
-3. Add these environment variables:
-   - `GROQ_API_KEY`: Your Groq API key
-   - `SECRET_KEY`: Generate with: `openssl rand -hex 32` or use: `python -c "import secrets; print(secrets.token_hex(32))"`
-   - `ALGORITHM`: `HS256`
+---
 
-4. Optional - Set Port explicitly:
-   - Go to "Settings" → Set PORT to `8000`
+## How to Test
 
-### 2.3 Configure Frontend Service
+1. Visit your frontend URL
+2. Login (any username works in demo mode)
+3. Try uploading a PDF
+4. Chat with AI
 
-**For Frontend Service:**
-1. Click on the frontend service
-2. Go to "Variables"
-3. Add environment variable:
-   - `VITE_API_URL`: This will be your backend URL from Railway
-   - Format: `https://your-backend-url.railway.app` (Railway auto-generates this)
+---
 
-4. Set "Start Command" in Settings:
-   ```
-   serve -s dist -l 3000
-   ```
+## Make Updates Later
 
-## Step 3: Get Your URLs
+To update your app:
 
-After deployment completes:
-- **Backend URL**: Will be shown in Railway dashboard (e.g., `https://medai-backend.railway.app`)
-- **Frontend URL**: Will be shown in Railway dashboard (e.g., `https://medai-frontend.railway.app`)
-
-## Step 4: Update Frontend with Backend URL
-
-Once you have the backend URL:
-
-1. Go to frontend service → Variables
-2. Update `VITE_API_URL` to your backend URL
-3. Railway will automatically redeploy
-
-## Troubleshooting
-
-### Backend won't start
-- Check logs: Click backend → "Logs" tab
-- Verify all environment variables are set
-- Ensure `GROQ_API_KEY` is correct
-
-### Frontend can't connect to backend
-- Ensure `VITE_API_URL` is set correctly in frontend Variables
-- Check browser console for CORS errors
-- Verify backend is running and accessible
-
-### FAISS index not persisting
-- Railway instances are ephemeral. Consider:
-  - Option A: Store FAISS index in cloud storage (S3, Supabase)
-  - Option B: Recreate index on each deployment
-  - For now, uploads will work but won't persist between restarts
-
-## Scaling & Production Considerations
-
-1. **Database**: Currently using in-memory storage. For production:
-   - Add PostgreSQL via Railway
-   - Store session/user data persistently
-
-2. **File Storage**: PDFs are temporary. For production:
-   - Add AWS S3 or similar for file storage
-   - Store file references in database
-
-3. **FAISS Index**: Currently local. For production:
-   - Consider: Pinecone, Weaviate, or other vector DB
-   - Or backup FAISS index to cloud storage
-
-## Monitoring & Logs
-
-Railway provides:
-- **Logs tab**: Real-time application logs
-- **Metrics tab**: CPU, memory, requests
-- **Deployments tab**: See all deployment history
-
-## Update & Redeploy
-
-To update and redeploy:
 ```bash
 git add .
 git commit -m "Your changes"
 git push origin main
 ```
 
-Railway automatically redeploys when you push to main!
+**Both Vercel and Render automatically redeploy!** ✨
 
-## Support
+---
 
-- Railway Docs: https://docs.railway.app
-- Project Issues: Check Railway logs for debugging
+## Troubleshooting
+
+### Backend not starting on Render
+- Go to service → "Logs" tab
+- Check if `GROQ_API_KEY` is set correctly
+
+### Frontend can't connect to backend
+- Check browser console (F12 → Console)
+- Verify `VITE_API_URL` is set to correct Render backend URL
+- Make sure backend service shows "Live" status
+
+### Need to update backend URL in frontend?
+- Go to Vercel project → Settings → Environment Variables
+- Edit `VITE_API_URL`
+- Vercel auto-redeploys
+
+### FAISS storage warning
+- Uploads won't persist between restarts
+- For production: use Pinecone or S3 storage
+
+---
+
+## Free Tier Limits
+
+**Render (Backend):**
+- Sleeps after 15 min of inactivity (free tier)
+- First request takes 30 sec to wake up
+- Upgrade to paid for always-on
+
+**Vercel (Frontend):**
+- 100 GB bandwidth/month
+- Unlimited projects
+- Always running
+
+---
+
+## Next Steps
+
+1. ✅ Backend deployed on Render
+2. ✅ Frontend deployed on Vercel
+3. ✅ Environment variables configured
+4. ✅ Auto-redeploy on git push
+5. 🎉 App is live!
+
+Enjoy your deployed app!
