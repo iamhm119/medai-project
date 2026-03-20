@@ -1,0 +1,10 @@
+# Railway Configuration (Optional)
+# This file can be used instead of Dockerfile for simplified Railway deployment
+
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "uvicorn main:app --host 0.0.0.0 --port $PORT"
+healthCheck = "/docs"
