@@ -1,6 +1,6 @@
 import os
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
-from services.embedding import embeddings
+from services.embedding import get_embeddings
 from langchain_community.vectorstores import FAISS
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -35,7 +35,7 @@ async def upload_pdf(
         if not split_docs:
             raise HTTPException(status_code=400, detail="PDF contains no valid text content")
 
-        db = FAISS.from_documents(split_docs, embeddings)
+        db = FAISS.from_documents(split_docs, get_embeddings())
         db.save_local("faiss_index")
 
         return {"message": "PDF processed successfully", "chunks": len(split_docs)}

@@ -1,4 +1,4 @@
-from services.embedding import embeddings
+from services.embedding import get_embeddings
 from langchain_community.vectorstores import FAISS
 from groq import Groq
 from config import GROQ_API_KEY
@@ -12,7 +12,7 @@ def load_db():
     try:
         db = FAISS.load_local(
             "faiss_index",
-            embeddings,
+            get_embeddings(),
             allow_dangerous_deserialization=True
         )
         return db
