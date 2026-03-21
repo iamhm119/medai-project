@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import Sidebar from "../components/Sidebar";
+import Sidebar from "../components/SideBar";
 import ChatWindow from "../components/ChatWindow";
 
 export default function Dashboard({ token, role, onLogout }) {
