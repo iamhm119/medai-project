@@ -1,20 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 
 function App() {
-  const [token, setToken] = useState(null);
-  const [role, setRole] = useState(null);
-
-  useEffect(() => {
-    const savedToken = localStorage.getItem("token");
-    const savedRole = localStorage.getItem("role");
-
-    if (savedToken) {
-      setToken(savedToken);
-      setRole(savedRole);
-    }
-  }, []);
+  const [token, setToken] = useState(() => localStorage.getItem("token"));
+  const [role, setRole] = useState(() => localStorage.getItem("role"));
 
   const handleLogout = () => {
     setToken(null);
