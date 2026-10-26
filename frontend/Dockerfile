@@ -6,6 +6,10 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
+# Build-time API URL (passed from docker-compose build args)
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+
 # Copy source and build
 COPY . .
 RUN npm run build
